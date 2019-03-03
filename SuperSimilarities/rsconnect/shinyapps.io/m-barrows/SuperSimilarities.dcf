@@ -1,0 +1,12 @@
+name: SuperSimilarities
+title: SuperSimilarities
+username:
+account: m-barrows
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 756731
+bundleId: 1911334
+url: https://m-barrows.shinyapps.io/SuperSimilarities/
+when: 1551561395.11602
+asMultiple: FALSE
+asStatic: FALSE
