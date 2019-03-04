@@ -13,21 +13,25 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Old Faithful Geyser Data"),
+  titlePanel("Super Similarities"),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
-       sliderInput("bins",
-                   "Number of bins:",
-                   min = 1,
-                   max = 50,
-                   value = 30)
-    ),
+      selectInput("characteristics",
+                   "Characteristics to Compare:",
+                  choices = c('universe','ALIGN','EYE','SEX','GSM','ALIVE'
+                              ,'AppearanceBin','firstMonth','firstYear'
+                              ,'identitiyStatus'),
+                  selected = c('universe','ALIGN','SEX','ALIVE','AppearanceBin'
+                               ,'firstYear','identityStatus'),
+                  multiple = T
+                  )
+      ),
     
     # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("distPlot")
+       tableOutput("dataHead")
     )
   )
 ))

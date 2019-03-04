@@ -48,14 +48,3 @@ com_Matrix[com_Matrix["sum"]==10,] %>%
   left_join(data %>% select(id,name), by = c("V1"="id" )) %>% 
   left_join(data %>% select(id,name), by = c("V2" = "id")) %>%
   select(name.x,name.y)
-
-#create dummy data
-# a <- matrix(sample(5, 500, TRUE), ncol = 5)
-# a<-cbind(a,101:(nrow(a)+100))
-# com <- t(combn(a[,6],2))
-# commonalities <- apply(com, 1, function(x){
-#   a[which(a[,6]==x[1]),1:5] == a[which(a[,6]==x[2],1:5)]
-# })
-# com <- as.data.frame(cbind(com,t(commonalities))) %>%
-#   mutate(sum = rowSums(.[3:7]))
-# com
