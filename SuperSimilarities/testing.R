@@ -9,7 +9,7 @@ marvel <- read.csv("./SuperSimilarities/data/marvel-data.csv")
 
 marvel <- marvel %>%
   separate(.,FIRST.APPEARANCE,c('firstMonth','y'),sep = "\\-") %>%
-  mutate(universe = 'marvel',
+  mutate(universe = as.factor('marvel'),
          url = paste0("https://marvel.fandom.com", str_remove_all(urlslug,"\\\\")),
          identitiyStatus = ID,
          firstMonth = factor(match(firstMonth,month.abb),labels = month.abb),
@@ -20,7 +20,7 @@ marvel <- marvel %>%
 
 dc <- dc %>%
   separate(.,FIRST.APPEARANCE,c('y','firstMonth'),sep = ", ") %>%
-  mutate(universe = 'dc',
+  mutate(universe = as.factor('dc'),
          url = paste0("https://dc.fandom.com", str_remove_all(urlslug,"\\\\")),
          identitiyStatus = ID,
          firstMonth = factor(match(firstMonth,month.name),labels = month.abb),
@@ -29,19 +29,33 @@ dc <- dc %>%
   filter(!is.na(firstMonth)) %>%
   na.omit()
 
-data <- rbind(marvel, dc)
-data <- cbind(1:nrow(data),data)
+data <- rbind(marvel, dc) %>%
+  filter(APPEARANCES > 50.00) %>%
+  mutate(AppearanceBin = .bincode(.$APPEARANCES,seq(from = 50.00,4100.00, by = 100), include.lowest = T)) %>%
+  select(name,universe,ALIGN,EYE,SEX,GSM,ALIVE,AppearanceBin,firstMonth,firstYear,identitiyStatus,url,APPEARANCES)
+data <- cbind(id = 1:nrow(data),data)
 
-com <- t(combn(data[,1],2))
 
+com <- as.data.frame(t(combn(data[,1],2)))
+commonalities <- apply(com, 1, function(x){
+  data[which(data[,1]==x[1]),3:12] == data[which(data[,1]==x[2]),3:12]
+})
+com_Matrix <- as.data.frame(cbind(com,t(commonalities))) %>%
+  mutate(sum = rowSums(.[3:12]))
+
+#perfect matches
+com_Matrix[com_Matrix["sum"]==10,] %>% 
+  left_join(data %>% select(id,name), by = c("V1"="id" )) %>% 
+  left_join(data %>% select(id,name), by = c("V2" = "id")) %>%
+  select(name.x,name.y)
 
 #create dummy data
-a <- matrix(sample(5, 500, TRUE), ncol = 5)
-a<-cbind(a,101:(nrow(a)+100))
-com <- t(combn(a[,6],2))
-commonalities <- apply(com, 1, function(x){
-  a[which(a[,6]==x[1]),1:5] == a[which(a[,6]==x[2],1:5)]
-})
-com <- as.data.frame(cbind(com,t(commonalities))) %>%
-  mutate(sum = rowSums(.[3:7]))
-com
+# a <- matrix(sample(5, 500, TRUE), ncol = 5)
+# a<-cbind(a,101:(nrow(a)+100))
+# com <- t(combn(a[,6],2))
+# commonalities <- apply(com, 1, function(x){
+#   a[which(a[,6]==x[1]),1:5] == a[which(a[,6]==x[2],1:5)]
+# })
+# com <- as.data.frame(cbind(com,t(commonalities))) %>%
+#   mutate(sum = rowSums(.[3:7]))
+# com
