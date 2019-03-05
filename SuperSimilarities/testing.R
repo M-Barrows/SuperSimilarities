@@ -48,3 +48,9 @@ com_Matrix[com_Matrix["sum"]==10,] %>%
   left_join(data %>% select(id,name), by = c("V1"="id" )) %>% 
   left_join(data %>% select(id,name), by = c("V2" = "id")) %>%
   select(name.x,name.y)
+
+col_Matrix <- read_csv("./SuperSimilarities/SimilarityMatrix.csv")
+colnames(col_Matrix) <- c('Hero1','Hero2','Universe','Alignment','Eye_Color'
+                          ,'Sex','GSM','Alive','AppearanceBin','Inaugural_Mo','Inaugural_Yr'
+                          ,'IdentitiyStatus','TotalSimilarities')
+write.csv(col_Matrix,"./SuperSimilarities/SimilarityMatrix_2019.csv")

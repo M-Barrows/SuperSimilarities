@@ -9,6 +9,7 @@
 
 library(shiny)
 
+
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
   
@@ -20,18 +21,24 @@ shinyUI(fluidPage(
     sidebarPanel(
       selectInput("characteristics",
                    "Characteristics to Compare:",
-                  choices = c('universe','ALIGN','EYE','SEX','GSM','ALIVE'
-                              ,'AppearanceBin','firstMonth','firstYear'
-                              ,'identitiyStatus'),
-                  selected = c('universe','ALIGN','SEX','ALIVE','AppearanceBin'
-                               ,'firstYear','identityStatus'),
+                  choices = c('Universe','Alignment','Eye_Color'
+                              ,'Sex','GSM','Alive','AppearanceBin','Inaugural_Mo','Inaugural_Yr'
+                              ,'IdentitiyStatus'),
+                  selected = c('Universe','Alignment','Sex','Alive','AppearanceBin','Inaugural_Yr'
+                               ,'IdentitiyStatus'),
                   multiple = T
-                  )
+                  ),
+      sliderInput("threshold",
+                  "Similarity Threshold",
+                  value = 90,
+                  min = 0,
+                  max = 100,
+                  step = 10)
       ),
     
     # Show a plot of the generated distribution
     mainPanel(
-       tableOutput("dataHead")
+       DT::dataTableOutput("dataHead")
     )
   )
 ))
