@@ -54,3 +54,60 @@ colnames(col_Matrix) <- c('Hero1','Hero2','Universe','Alignment','Eye_Color'
                           ,'Sex','GSM','Alive','AppearanceBin','Inaugural_Mo','Inaugural_Yr'
                           ,'IdentitiyStatus','TotalSimilarities')
 write.csv(col_Matrix,"./SuperSimilarities/SimilarityMatrix_2019.csv")
+
+
+
+### Network graph 
+
+edges <- subset(com_Matrix,Hero1==20 | Hero2==20)   #sample(nrow(com_Matrix),500)
+edges <- edges %>% 
+  dplyr::union(subset(com_Matrix,Hero1 %in% edges$Hero1 & Hero2 %in% edges$Hero2)) %>%
+  mutate(
+    from = Hero1
+    , to = Hero2
+    , width = TotalSimilarities/2
+    , color = 'gray'
+    ) %>%
+  filter(TotalSimilarities > 6)
+  
+nodes <- data %>%
+  filter(id %in% c(edges$from, edges$to)) %>%
+  select(id,label = Name, color = Universe, value = AppearanceBin) %>%
+  mutate(color = ifelse(color == 'marvel','red','blue'),
+         value = (value+10)/10)
+visNetwork(nodes = nodes,edges = edges) %>%
+  visOptions(highlightNearest = list(enabled = T, degree = 2, hover = T)) %>%
+  visGroups(groupname = "dc", color = "darkblue") %>%
+  visGroups(groupname = "marvel", color = "red")
+  #visPhysics(enabled = T) %>%
+  #visIgraphLayout()
+
+library(dplyr)
+library(visNetwork)
+library(readr)
+edge <- read_csv("./SuperSimilarities/data/social_network/edges.csv")
+node <- read_csv("./SuperSimilarities/data/social_network/nodes.csv")
+heros <- node %>% filter(type == 'hero') %>% distinct()
+comics <- node %>% filter(type == 'comic') %>% distinct()
+network <- read_csv("./SuperSimilarities/data/social_network/hero-network.csv")
+network <- network %>% 
+  group_by(h1 = pmin(hero1,hero2), h2 = pmax(hero1,hero2)) %>% 
+  mutate(length = n()) %>%
+  filter(length >= 100) %>%
+  mutate(length = (1/length)*1000)
+  distinct()
+e1 <- network %>% select(from = h1, to = h2, length) %>% filter(from != to) %>% distinct()
+# e2 <- e1 %>% 
+#   union(
+#     network %>% 
+#       select(from = h1, to = h2, length) %>%
+#       filter(from %in% unique(c(e1$from, e1$to)) & 
+#                to %in% unique(c(e1$from, e1$to)) &
+#                from != to)
+#     ) %>%
+#   distinct()
+n1 <-  data.frame(id = unique(c(e1$from, e1$to)), label = unique(c(e1$from, e1$to))) %>% distinct()
+visNetwork(n1,e1) %>%
+  visOptions(highlightNearest = list(enabled = T, degree = 1, hover = T),
+             nodesIdSelection = F)
+  #visIgraphLayout()
